@@ -4,17 +4,27 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.TextView;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends Activity {
+    private static final String kEchoUrl = "http://headers.jsontest.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +38,30 @@ public class MainActivity extends Activity {
         }
 
         RequestQueue q = Volley.newRequestQueue(this);
+
+        JSONObject params  = new JSONObject();
+        try {
+            params.put("hello", "world");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        q.add(new JsonObjectRequest(Request.Method.GET, kEchoUrl, params, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d("XXX", response.toString());
+                TextView textView = (TextView) findViewById(R.id.hello);
+                try {
+                    textView.setText(response.toString(2));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }));
     }
 
 
